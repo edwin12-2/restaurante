@@ -1,0 +1,125 @@
+{% extends 'tienda/basico.html' %}
+
+
+
+
+
+{% block title %}Verificar{% endblock  %}
+{% block body %}
+
+{% if user.is_authenticated %}
+<div class="container">
+  <div class="my-5">
+    <div class="">
+      <span id="title">Verificar carrito de compras</span>
+      <ul class="lis-group" id='items'>
+      </ul>
+    </div>
+  </div>
+  <div class="mb-5">
+    <span id="info">
+      <h2>Nombre: {{request.user.first_name}} - Dirección & y otros detalles</h2>
+      <form method="post" action="/tienda/verificar/">{% csrf_token %}
+        <input type="hidden" name="itemsJson" id="itemsJson">
+        <input type="hidden" name="monto" id="monto">
+        <input type="hidden" name="user_id" id="user_id" value="{{request.user.id}}">
+        <div class="col-md-6">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+        </div>
+        <div class="col-md-6">
+          <label for="correo" class="form-label">Correo</label>
+          <input type="email" class="form-control" id="correo" name="correo" placeholder="correo">
+        </div>
+        <div class="col-12">
+          <label for="direccion" class="form-label">Dirección</label>
+          <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección">
+        </div>
+        <div class="col-12">
+          <label for="direccion2" class="form-label">Dirección 2</label>
+          <input type="text" class="form-control" id="direccion2" name="direccion2" placeholder="Dirección 2">
+        </div>
+        <div class="col-md-6">
+          <label for="ciudad" class="form-label">Ciudad</label>
+          <input type="text" class="form-control" id="ciudad" name="ciudad">
+        </div>
+        <div class="col-md-4">
+          <label for="estado" class="form-label">Estado</label>
+          <input type="text" class="form-control" id="estado" name="estado">
+        </div>
+        <div class="col-md-2">
+          <label for="postal" class="form-label">Código postal</label>
+          <input type="text" class="form-control" id="postal" name="postal">
+        </div>
+        <div class="col-md-2">
+          <label for="celular" class="form-label">Celular</label>
+          <input type="text" class="form-control" id="celular" name="celular">
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-success" name="delivery">Pago delivery</button>
+        </div>
+      </form>
+    </span>
+  </div>
+</div>
+
+{% else %}
+<div classs="container">&nbsp;
+    <a href="/tienda" class="active text-dark">
+        <i class="fas fa-qrcode"></i>
+        <span>Ingrese</span>
+    </a>
+</div>
+{% endif %}
+<div class="container">
+  <footer class="py-3 my-4">
+      <p class="text-center text-body-secondary">Build by Edwin - © 2023</p>
+    </footer>
+</div>
+{% endblock  %}
+{% block js %}
+<script>
+if (localStorage.getItem('carrito') == null){
+    var carrito = {};
+} else {
+    carrito = JSON.parse(localStorage.getItem('carrito'));
+}
+var suma = 0;
+var sumaPrecio = 0;
+var precioTotal = 0;
+if ($.isEmptyObject(carrito)){
+  mstr = "nn<div class='alert alert-info'><font style='font size:18px'>";
+  mstr = mstr + "<center>SU carrito está <strong>Vacío</strong>, por favor <strong>Agrega</strong> algunos productos! </center>";
+  mstr = mstr + "<center><a href='/tienda/' class='btn btn-success'>Tienda</a></font></div>";
+  $('#items').append(mstr);
+  document.getElementById('info').innerHTML = "";
+  document.getElementById('title').innerHTML = "";
+} else {
+  var i = 0;
+  for (item in carrito){
+    let nombre = carrito[item][1];
+    let cant = carrito[item][0];
+    let iPrecio = carrito[item][2];
+    suma = suma + cant;
+    sumaPrecio = cant * iPrecio;
+    precioTotal = precioTotal + sumaPrecio;
+    mstr = `ss<li class="list-group">${++i} : ${nombre}<span>${cant} x S/. ${iPrecio} = s/. ${sumaPrecio}</span></li>`;
+    $('#items').append(mstr);
+  }
+  mstr = `<li class="bg bg-info">Precio total: </span><span id="precioTotal">s/. ${precioTotal} /-</span></li>`;
+  $('#items').append(mstr);
+}
+document.getElementById('carrito').innerHTML = suma;
+document.getElementById('precioTotal').innerHTML = precioTotal;
+
+
+$('#itemsJson').val(JSON.stringify(carrito));
+$('#monto').val($('#precioTotal').html());
+
+{% if thank %}
+alert('Gracias por ordenar su id del pedido es {{id}}. ');
+localStorage.clear();
+document.location="/tienda";
+{% endif %}
+</script>
+{% endblock  %}

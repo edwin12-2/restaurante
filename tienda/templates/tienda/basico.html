@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <link rel="stylesheet" href="">
+    </head>
+    <body class="">
+        <nav class="navbar navbar-expand-lg bg-body-secondary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/tienda">Restaurante</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="../">Inicio</a>
+                  </li>
+                  <li class="nav-item dropdown" id="categoriaLista">
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/tienda/rastreo">Seguimiento</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/tienda/verPedido">Sus pedidos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Acerca de</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Contactos</a>
+                  </li>
+                </ul>
+              </div>
+                <form method="get" action="/tienda/buscar" class="d-flex" >
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="buscar" id="buscar">
+                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                </form>
+                {% if user.is_authenticated %}
+                <ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/tienda/logout">Salir</a>
+                        {% comment %} <a class="nav-link" href="/tienda/logout/">Salir</a> {% endcomment %}
+                    </li>
+                </ul>
+                {% else %}
+                <button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Ingresar</button>
+                <button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#registroModal" data-bs-whatever="@mdo">Registrarse</button>
+                {% endif %}
+              <button type="button" class="btn btn-secondary mx-2" id="popcarrito" data-html="true" data-toggle="popover" data-placement="bottom" data-content="Bottom popover">
+                Carrito - (<span id="carrito">0</span>)
+              </button>
+            </div>
+        </nav>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Ingresar</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="/tienda/login/" method="post">{% csrf_token %}
+                  <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Usuario:</label>
+                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="admin">
+                  </div>
+                  <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Clave:</label>
+                    <input type="text" class="form-control" id="clave" name="clave" placeholder="admin">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Ingresar</button>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Registrarse</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form class="row g-3" method="post" action="/tienda/signup/">
+                    {% csrf_token %}
+                    <div class="col-md-4">
+                      <label for="usuario" class="form-label">Usuario</label>
+                      <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ingrese el nombre de usuario">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="apellidos" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" id="apellidos" name="apellidos" placeholder="Ingrese los apellidos">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="correo" class="form-label">Correo</label>
+                      <input type="text" class="form-control" id="correo" name="correo">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="correo" class="form-label">Celular</label>
+                      <input type="tel" class="form-control" id="celular" name="celular">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="validationDefault04" class="form-label">Clave</label>
+                      <input type="password" class="form-control" id="clave1" name="clave1" placeholder="Ingrese su clave">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="validationDefault04" class="form-label">Confirmar clave</label>
+                        <input type="password" class="form-control" id="clave2" name="clave2" placeholder="Confirmar su clave">
+                      </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary" type="submit">Registrarse</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        {% if messages  %}
+            {% for mensaje in messages %}
+            <div class="alert alert-{{ mensaje.tags}} alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{mensaje}}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% block body %}
+        
+        {% endblock  %}
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+        <script>
+            const exampleModal = document.getElementById('exampleModal')
+            if (exampleModal) {
+              exampleModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                //const button = event.relatedTarget
+              })
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/bootstrap-show-password@1.2.1/dist/bootstrap-show-password.min.js"></script>
+      
+    </body>
+</html>

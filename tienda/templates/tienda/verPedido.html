@@ -1,0 +1,118 @@
+{% extends 'tienda/basico.html' %}
+
+
+
+
+
+
+
+
+
+{% block title %}
+Pedidos
+{% endblock  %}
+
+{% block body %}
+
+{% if user.is_authenticated %}
+
+<div>
+    <div>
+        <div>
+            <div>
+                <div>
+                    <h2>Detalles</h2>
+                </div>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Dirección</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Celular</th>
+                <th scope="col">Fecha orden</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Productos</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for i in pedidoH %}
+              <tr>
+                <td></td>
+                <td>{{i.pedido_id}}</td>
+                <td>{{i.nombre}}</td>
+                <td title="{{i.direccion}}">{{i.direccion|slice:"0:25"}}</td>
+                <td>{{i.correo}}</td>
+                <td>{{i.celular}}</td>
+                <td>{{i.reloj}}</td>
+                <td>{{i.monto}}</td>
+                <td><a href="#" id="click{{i.pedido_id}}"><i class="material-icons">&#xE5C8;</i></a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div id="citems"></div>
+  </div>
+</div>
+
+{% else %}
+<div class="">
+    <div class="">
+        <h1>Necesita ingresar</h1>
+    </div>
+</div>
+{% endif %}
+<div class="container">
+  <footer class="py-3 my-4">
+      <p class="text-center text-body-secondary">Build by Edwin - © 2023</p>
+    </footer>
+</div>
+{% endblock  %}
+
+{% block js %}
+
+<script>
+
+{% for i in pedidoH %}
+$('#click{{i.pedido_id}}').click(function(){
+  $('#citems').empty();
+  id = `<div><b>ID: {{i.pedido_id}}</b></div>`
+  $('#citems').append(id);
+  data = "{{i.e_json}}";
+  var data = data.replace(/&quot;/g, '"');
+  obj = JSON.parse(data);
+  var suma = 0;
+  var sumaPrecio = 0;
+  for (item in obj) {
+    let nombre = obj[item][1];
+    let cant = obj[item][0];
+    let precio = obj[item][2];
+    suma = suma + cant;
+    sumaPrecio = cant + precio;
+    mstr = `<li class="list-group-item">
+      ${nombre}: <span class="">${cant} x s/. ${precio} = <span class="">s/. ${sumaPrecio}</span></span>
+    </li>`
+    $('#citems').append(mstr);
+  }
+});
+{% endfor %}
+$('#popcarrito').popover();
+updatePopover(carrito);
+
+function updatePopover(carrito){
+  var p = "";
+  p = p + "<a href='/tienda/verificar' class='btn btn-success'>Ver</a>"
+  document.getElementById("popcarrito").setAttribute('data-content', p);
+  $('#popcarrito').popover();
+};
+</script>
+
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+{% endblock  %}

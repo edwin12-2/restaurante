@@ -1,0 +1,43 @@
+{% extends 'tienda/basico.html' %}
+
+
+
+<div class=" m-auto col-lg-8 p-4 py-md-5">
+
+    
+    
+{% block body %}
+<div classs="container">&nbsp;
+    <a href="/tienda" class="active text-dark">
+        <i class="fas fa-qrcode"></i>
+        <span>Ver productos</span>
+    </a>
+</div>
+{% block title %} {{producto.p_nombre}} - Restaurante {% endblock  %}
+<hr>
+<div class="mb-5" id="co">
+    <div class="row g-5">
+        <div class="col-md-6">
+            <img src="/images/{{producto.imagen}}" >
+        </div>
+        <div class="col-md-6">
+            <h4>Nombre: {{producto.p_nombre}}</h4>
+            <p><b>Precio: {{producto.precio}}</b> S/.</p>
+            <b>Descuento: {{producto.descuento}}</b>
+            <div class="row">
+                <center>
+                <a class="btn btn-primary" href='/tienda/buscar/?buscar={{producto.p_nombre}}'>Ordenar</a>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock  %}
+</div>
+
+<div class="container">
+    <footer class="py-3 my-4">
+        <p class="text-center text-body-secondary">Build by Edwin - © 2023</p>
+    </footer>
+</div>

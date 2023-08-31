@@ -1,0 +1,132 @@
+{% extends 'tienda/basico.html' %}
+
+
+
+
+
+
+{% block title %}Rastreo{% endblock  %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<div class="container">
+    <div class="row">
+      <form method="post" action="#" id="rastreo">{% csrf_token %}
+        <div class="col-md-6">
+          <label for="id" class="form-label">Pedido id</label>
+          <input type="number" class="form-control" id="id" name="id" placeholder="1-9">
+        </div>
+        <div class="col-md-6">
+          <label for="correo" class="form-label">Correo</label>
+          <input type="email" class="form-control" id="correos" name="correos" placeholder="correo">
+        </div>
+        <div class="col-md-2">
+          <label for="claves" class="form-label">Clave</label>
+          <input type="password" class="form-control" id="claves" name="claves">
+        </div>
+        <div class="col-12">
+            <input type="" name="nombres" id="nombres" value="{{request.user}}">
+            <button type="" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
+    </div>
+    <div id="mydiv">
+    </div>
+</div>
+{% else %}
+<div classs="container">&nbsp;
+    <a href="/tienda" class="active text-dark">
+        <i class="fas fa-qrcode"></i>
+        <span>Ingrese</span>
+    </a>
+</div>
+{% endif %}
+{% endblock  %}
+
+
+<div class="container">
+  <footer class="py-3 my-4">
+      <p class="text-center text-body-secondary">Build by Edwin - © 2023</p>
+    </footer>
+</div>
+
+
+
+
+
+{% block js %}
+<script>
+$('#popcarrito').popover();
+updatePopover(carrito);
+
+function updatePopover(carrito) {
+    var p = "";
+    p = p + "<a href='/tienda/verificar' class='btn btn-success'>Ver</a>"
+    document.getElementById("popcarrito").setAttribute('data-content', p);
+    $('#popcarrito').popover();
+}
+$('#rastreo').submit(function(event) {
+    $('#mydiv').empty();
+    var formD = {
+        'id': $('input[name=id]').val(),
+        'correo': $('input[name=correos]').val(),
+        'clave': $('input[name=claves]').val(),
+        'nombre': $('input[name=nombres]').val(),
+        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+    };
+    $.ajax({
+        type: 'POST',
+        url: '/tienda/rastreo/',
+        data: formD,
+        encode: true
+    })
+    .done(function(data) {
+        $('#mydiv').empty();
+        data = JSON.parse(data);
+        mydiv = `
+        <ul class="list-group" id="items"></ul>`;
+        $('#mydiv').append(mydiv);
+
+        if (data['status'] == "comprobado") {
+         actualizas = data['actualizas'];
+         mydiv = `
+         <ul class="list-group" id="citems"></ul>`;
+         $('#mydiv').append(mydiv);
+         for (i = 0; i < actualizas.length; i++) {
+            let texto = actualizas[i]['text'];
+            let tiempo = actualizas[i]['time'];
+            var s = new Date(tiempo).toLocaleString(undefined, {timeZone: 'America/Los_Angeles'});
+            mstr = `
+            <li class="list-group-item">${texto}: (${s})</li>`
+            $('#items').append(mstr);
+         }
+         carrito = JSON.parse(data['itemsJson']);
+         for (item in carrito) {
+            let nombre = carrito[item][1];
+            let cant = carrito[item][0];
+            mstr = `
+          <li class="list-group-item">${nombre}: (${cant})</li>`
+          $('#citems').append(mstr);
+         }
+        } else if (data['status'] == "fallo") {
+          alert("Clave incorrecto");
+          mstr = `
+          <li class="list-group-item">Usuario-Clave incorrecto</li>`
+          $('#items').append(mstr);
+        } else {
+          mstr = `
+          <li class="list-group-item">Id-Correo incorrecto</li>`
+          $('#items').append(mstr);
+        }
+    });
+    event.preventDefault();
+});
+</script>
+
+
+{% endblock  %}
+
+
+
+
+
